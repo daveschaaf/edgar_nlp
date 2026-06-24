@@ -1,0 +1,10 @@
+#!/bin/sh
+# Auto-strip Colab's broken metadata.widgets from staged notebooks before commit,
+# so GitHub can always render them. Activated via: git config core.hooksPath tools/git-hooks
+files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ipynb$')
+[ -z "$files" ] && exit 0
+
+python3 tools/strip_widgets.py --staged
+# re-stage any notebooks the cleaner modified
+echo "$files" | xargs git add
+exit 0
